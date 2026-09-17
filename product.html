@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — MH Websites</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<div class="container">
+  <nav class="breadcrumb" id="breadcrumb"></nav>
+</div>
+
+<section style="padding-top:0;">
+  <div class="container" id="productRoot"></div>
+</section>
+
+<section id="relatedSection" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head"><h2 style="font-size:1.4rem;">You may also need</h2></div>
+    <div class="grid cols-4" id="relatedGrid"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/nav.js"></script>
+<script>
+  renderHeader("shop");
+  renderFooter();
+
+  const id = new URLSearchParams(window.location.search).get("id");
+  const product = PRODUCTS.find(p=>p.id===id);
+
+  if(!product){
+    document.getElementById("productRoot").innerHTML = `
+      <div class="empty-state">
+        <h3>Product not found</h3>
+        <p>That part number isn't in our catalog.</p>
+        <a href="shop.html" class="btn btn-primary" style="margin-top:14px;">Back to Shop</a>
+      </div>`;
+    document.getElementById("relatedSection").style.display = "none";
+  } else {
+    document.title = product.name + " — MH Websites";
+    document.getElementById("breadcrumb").innerHTML =
+      `<a href="index.html">Home</a> / <a href="shop.html?category=${product.category}">${CATEGORY_LABELS[product.category]}</a> / ${product.name}`;
+
+    const specRows = [];
+    specRows.push(["Brand", product.brand]);
+    specRows.push(["Category", CATEGORY_LABELS[product.category]]);
+    if(product.color) specRows.push(["Colour", product.color[0].toUpperCase()+product.color.slice(1)]);
+    if(product.yield) specRows.push(["Rated page yield", product.yield.toLocaleString() + " pages"]);
+    if(product.specs){
+      Object.entries(product.specs).forEach(([k,v])=> specRows.push([k.charAt(0).toUpperCase()+k.slice(1), v]));
+    }
+    specRows.push(["SKU", product.id]);
+
+    document.getElementById("productRoot").innerHTML = `
+      <div class="pd-layout">
+        <div class="pd-media"><span class="media-label">Representative image</span>${productVisual(product,true)}</div>
+        <div>
+          <div class="pd-brand">${product.brand}</div>
+          <h1 class="pd-title">${product.name}</h1>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${stockBadge(product)}
+            <span class="card-sku">${product.id}</span>
+          </div>
+          <div class="pd-price">${formatPrice(product.price)}</div>
+          ${yieldGauge(product)}
+          <p>${product.desc}</p>
+
+          ${product.compatible ? `
+            <h4 style="font-size:.8rem;margin-top:20px;">Confirmed compatible with</h4>
+            <div class="tag-list">${product.compatible.map(m=>`<span class="tag">${m}</span>`).join("")}</div>
+          ` : ""}
+
+          <div class="qty-row">
+            <div class="stepper">
+              <button type="button" id="qtyMinus">−</button>
+              <input type="text" id="qtyInput" value="1" readonly>
+              <button type="button" id="qtyPlus">+</button>
+            </div>
+            <button class="btn btn-primary" id="addToCartBtn" ${product.stock==="out"?"disabled":""}>
+              ${product.stock==="out" ? "Out of Stock" : "Add to Cart"}
+            </button>
+          </div>
+
+          <table class="spec-table">
+            ${specRows.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("")}
+          </table>
+        </div>
+      </div>
+    `;
+
+    let qty = 1;
+    const qtyInput = document.getElementById("qtyInput");
+    document.getElementById("qtyMinus").addEventListener("click", ()=>{ qty=Math.max(1,qty-1); qtyInput.value=qty; });
+    document.getElementById("qtyPlus").addEventListener("click", ()=>{ qty+=1; qtyInput.value=qty; });
+    document.getElementById("addToCartBtn").addEventListener("click", ()=>{
+      addToCart(product.id, qty);
+      showToast(`Added ${qty} × ${product.name} to cart`);
+    });
+
+    const related = PRODUCTS.filter(p=>p.category===product.category && p.id!==product.id).slice(0,4);
+    document.getElementById("relatedGrid").innerHTML = related.length
+      ? related.map(productCard).join("")
+      : `<p>No related products yet.</p>`;
+  }
+</script>
+</body>
+</html>

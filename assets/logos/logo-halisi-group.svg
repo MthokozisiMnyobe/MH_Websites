@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 160" role="img" aria-labelledby="title desc">
+  <title id="title">Halisi Group placeholder logo</title><desc id="desc">Replace this file with the approved Halisi Group logo.</desc>
+  <rect width="420" height="160" rx="24" fill="#fff4ef"/>
+  <rect x="28" y="28" width="104" height="104" rx="52" fill="#FF4800"/>
+  <path d="M55 105V55h15v18h20V55h15v50H90V86H70v19z" fill="#fff"/>
+  <text x="158" y="74" font-family="Arial, sans-serif" font-weight="800" font-size="28" fill="#0A1633">HALISI GROUP</text>
+  <text x="158" y="101" font-family="Arial, sans-serif" font-weight="600" font-size="15" fill="#44516c">(PTY) LTD</text>
+  <text x="158" y="123" font-family="Arial, sans-serif" font-size="12" fill="#1F51FF" letter-spacing="1.5">LOGO PLACEHOLDER</text>
+</svg>

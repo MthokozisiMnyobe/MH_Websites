@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart — MH Websites</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<div class="page-banner">
+  <div class="container">
+    <span class="eyebrow" style="color:var(--orange-600)">Step 1 of 2</span>
+    <h1>Your Cart</h1>
+    <p>Review your items before checkout. Prices update automatically.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container" id="cartRoot"></div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/nav.js"></script>
+<script>
+  renderHeader("shop");
+  renderFooter();
+
+  function render(){
+    const lines = cartLines();
+    const root = document.getElementById("cartRoot");
+
+    if(!lines.length){
+      root.innerHTML = `
+        <div class="empty-cart">
+          <div class="glyph">🛒</div>
+          <h3>Your cart is empty</h3>
+          <p>Browse the catalog and find the parts that fit your printer.</p>
+          <a href="shop.html" class="btn btn-primary">Shop All Products</a>
+        </div>`;
+      return;
+    }
+
+    const subtotal = cartSubtotal();
+    const shipping = subtotal >= 750 || subtotal === 0 ? 0 : 99;
+    const total = subtotal + shipping;
+
+    root.innerHTML = `
+      <div class="cart-layout">
+        <div>
+          <table class="cart-table">
+            <thead><tr><th colspan="2">Product</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+            <tbody>
+              ${lines.map(l=>`
+                <tr>
+                  <td style="width:64px;"><div class="cart-thumb">${glyphFor(l.product.category, l.product.color)}</div></td>
+                  <td>
+                    <div class="cart-row-title">${l.product.name}</div>
+                    <div class="cart-row-sku">${l.product.id}</div>
+                  </td>
+                  <td class="mono">${formatPrice(l.product.price)}</td>
+                  <td>
+                    <div class="stepper">
+                      <button type="button" class="qm" data-id="${l.id}">−</button>
+                      <input type="text" value="${l.qty}" readonly>
+                      <button type="button" class="qp" data-id="${l.id}">+</button>
+                    </div>
+                  </td>
+                  <td class="mono">${formatPrice(l.product.price * l.qty)}</td>
+                  <td><a href="#" class="remove-link" data-id="${l.id}">Remove</a></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          <a href="shop.html" class="btn btn-outline btn-sm" style="margin-top:22px;">← Continue Shopping</a>
+        </div>
+
+        <div class="summary-box">
+          <h3 style="font-size:1rem;">Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span class="mono">${formatPrice(subtotal)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span class="mono">${shipping===0 ? "FREE" : formatPrice(shipping)}</span></div>
+          <div class="summary-row total"><span>Total</span><span>${formatPrice(total)}</span></div>
+          <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:18px;">Proceed to Checkout</a>
+        </div>
+      </div>
+    `;
+
+    root.querySelectorAll(".qm").forEach(b=> b.addEventListener("click", ()=>{
+      const line = lines.find(l=>l.id===b.dataset.id);
+      setQty(b.dataset.id, line.qty-1 < 1 ? 1 : line.qty-1);
+      render();
+    }));
+    root.querySelectorAll(".qp").forEach(b=> b.addEventListener("click", ()=>{
+      const line = lines.find(l=>l.id===b.dataset.id);
+      setQty(b.dataset.id, line.qty+1);
+      render();
+    }));
+    root.querySelectorAll(".remove-link").forEach(b=> b.addEventListener("click", (e)=>{
+      e.preventDefault();
+      removeFromCart(b.dataset.id);
+      render();
+    }));
+  }
+
+  render();
+</script>
+</body>
+</html>

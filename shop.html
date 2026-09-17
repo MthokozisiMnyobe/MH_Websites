@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop All Products — MH Websites</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<div class="page-banner store-banner">
+  <div class="container store-banner-grid">
+    <div><span class="eyebrow">MH Technology Store</span><h1>Find the right supplies without the guesswork.</h1><p>Search a product, part number, printer brand or compatible model. Product imagery is representative while the demo catalogue is being finalised.</p></div>
+    <div class="store-search-panel">
+      <label for="searchInput">What are you looking for?</label>
+      <div class="store-search-box"><span aria-hidden="true">⌕</span><input type="search" id="searchInput" autocomplete="off" placeholder="Try “HP 410A”, “drum” or “printer”…"><button type="button" id="searchClear" aria-label="Clear search">×</button></div>
+      <div class="search-suggestions" id="searchSuggestions" hidden></div>
+      <div class="popular-searches"><span>Popular:</span><button type="button" data-search="toner">Toner</button><button type="button" data-search="drum">Drums</button><button type="button" data-search="printer">Printers</button><button type="button" data-search="HP">HP</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="category-rail"><div class="container"><button type="button" class="category-chip active" data-category="">All products</button><button type="button" class="category-chip" data-category="toner">Toner &amp; ink</button><button type="button" class="category-chip" data-category="drum">Drum units</button><button type="button" class="category-chip" data-category="printer">Printers</button><button type="button" class="category-chip" data-category="accessory">Accessories</button></div></div>
+
+<section>
+  <div class="container shop-layout">
+    <aside class="filters">
+      <div class="filter-head"><div><span class="eyebrow">Refine results</span><h3>Filters</h3></div><button type="button" id="closeFilters" aria-label="Close filters">×</button></div>
+      <div class="filter-group">
+        <h4>Category</h4>
+        <div id="categoryFilters"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Brand</h4>
+        <div id="brandFilters"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Availability</h4>
+        <div id="stockFilters">
+          <label><input type="checkbox" value="in" checked> In stock</label>
+          <label><input type="checkbox" value="low" checked> Low stock</label>
+          <label><input type="checkbox" value="out" checked> Out of stock</label>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-block btn-sm" id="clearFilters">Clear all filters</button>
+    </aside>
+
+    <div>
+      <div class="toolbar">
+        <div><button type="button" class="btn btn-outline btn-sm mobile-filter-btn" id="openFilters">Filters</button><span class="result-count" id="resultCount"></span></div>
+        <label class="sort-label">Sort by <select id="sortSelect">
+          <option value="relevance">Sort: Relevance</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Name: A–Z</option>
+        </select></label>
+      </div>
+      <div class="grid cols-3" id="productGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <h3 style="font-size:1.1rem;">No products match those filters</h3>
+        <p>Try clearing a filter or searching a different term.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/nav.js"></script>
+<script>
+  renderHeader("shop");
+  renderFooter();
+
+  const params = new URLSearchParams(window.location.search);
+  const state = {
+    search: params.get("search") || "",
+    categories: new Set(params.get("category") ? [params.get("category")] : []),
+    brands: new Set(params.get("brand") ? [params.get("brand")] : []),
+    stock: new Set(["in","low","out"]),
+    sort: "relevance",
+    model: params.get("model") || "",
+  };
+
+  const allCategories = Object.keys(CATEGORY_LABELS);
+  const allBrands = [...new Set(PRODUCTS.map(p=>p.brand))].sort();
+
+  document.getElementById("categoryFilters").innerHTML = allCategories.map(c=>`
+    <label><input type="checkbox" data-cat="${c}" ${state.categories.has(c)?'checked':''}> ${CATEGORY_LABELS[c]}</label>
+  `).join("");
+  document.getElementById("brandFilters").innerHTML = allBrands.map(b=>`
+    <label><input type="checkbox" data-brand="${b}" ${state.brands.has(b)?'checked':''}> ${b}</label>
+  `).join("");
+
+  document.getElementById("searchInput").value = state.search;
+
+  const searchInput = document.getElementById("searchInput");
+  const suggestionBox = document.getElementById("searchSuggestions");
+  document.querySelectorAll('.category-chip').forEach(btn=>btn.classList.toggle('active', state.categories.size ? state.categories.has(btn.dataset.category) : btn.dataset.category===''));
+
+  function updateSuggestions(){
+    const term = searchInput.value.trim().toLowerCase();
+    if(!term){ suggestionBox.hidden=true; suggestionBox.innerHTML=""; return; }
+    const matches = PRODUCTS.filter(p=>(p.name+" "+p.id+" "+p.brand+" "+(p.compatible||[]).join(" ")).toLowerCase().includes(term)).slice(0,5);
+    suggestionBox.innerHTML = matches.length ? matches.map(p=>`<a href="product.html?id=${encodeURIComponent(p.id)}"><span>${CATEGORY_LABELS[p.category]} · ${p.brand}</span><strong>${p.name}</strong><small>${p.id}</small></a>`).join("") : `<p>No quick matches. Press Enter to search all products.</p>`;
+    suggestionBox.hidden=false;
+  }
+
+  function currentFilters(){
+    const catBoxes = [...document.querySelectorAll('[data-cat]')];
+    const checkedCats = catBoxes.filter(b=>b.checked).map(b=>b.dataset.cat);
+    state.categories = new Set(checkedCats.length ? checkedCats : (catBoxes.length ? [] : []));
+    // if none checked, treat as "all" (no filter)
+    const anyCatChecked = catBoxes.some(b=>b.checked);
+    state.categories = anyCatChecked ? new Set(checkedCats) : new Set();
+
+    const brandBoxes = [...document.querySelectorAll('[data-brand]')];
+    const checkedBrands = brandBoxes.filter(b=>b.checked).map(b=>b.dataset.brand);
+    const anyBrandChecked = brandBoxes.some(b=>b.checked);
+    state.brands = anyBrandChecked ? new Set(checkedBrands) : new Set();
+
+    const stockBoxes = [...document.querySelectorAll('#stockFilters input')];
+    state.stock = new Set(stockBoxes.filter(b=>b.checked).map(b=>b.value));
+
+    state.search = document.getElementById("searchInput").value.trim().toLowerCase();
+    state.sort = document.getElementById("sortSelect").value;
+  }
+
+  function applyFilters(){
+    currentFilters();
+    let results = PRODUCTS.filter(p=>{
+      if(state.categories.size && !state.categories.has(p.category)) return false;
+      if(state.brands.size && !state.brands.has(p.brand)) return false;
+      if(!state.stock.has(p.stock)) return false;
+      if(state.model && !(p.compatible||[]).includes(state.model)) return false;
+      if(state.search){
+        const hay = (p.name+" "+p.id+" "+p.brand+" "+CATEGORY_LABELS[p.category]+" "+(p.compatible||[]).join(" ")).toLowerCase();
+        if(!hay.includes(state.search)) return false;
+      }
+      return true;
+    });
+
+    if(state.sort==="price-asc") results.sort((a,b)=>a.price-b.price);
+    if(state.sort==="price-desc") results.sort((a,b)=>b.price-a.price);
+    if(state.sort==="name-asc") results.sort((a,b)=>a.name.localeCompare(b.name));
+
+    document.getElementById("resultCount").textContent = `${results.length} PRODUCT${results.length===1?'':'S'}`;
+    document.getElementById("productGrid").innerHTML = results.map(productCard).join("");
+    document.getElementById("emptyState").style.display = results.length ? "none" : "block";
+  }
+
+  document.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener("change", applyFilters);
+  });
+  searchInput.addEventListener("input", ()=>{applyFilters();updateSuggestions();});
+  searchInput.addEventListener("keydown", e=>{if(e.key==="Enter") suggestionBox.hidden=true;});
+  document.addEventListener("click",e=>{if(!e.target.closest('.store-search-panel')) suggestionBox.hidden=true;});
+  document.getElementById("searchClear").addEventListener("click",()=>{searchInput.value="";suggestionBox.hidden=true;applyFilters();searchInput.focus();});
+  document.querySelectorAll('[data-search]').forEach(btn=>btn.addEventListener('click',()=>{searchInput.value=btn.dataset.search;applyFilters();updateSuggestions();}));
+  document.querySelectorAll('.category-chip').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.category-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('[data-cat]').forEach(box=>box.checked=box.dataset.cat===btn.dataset.category);applyFilters();}));
+  const filterPanel=document.querySelector('.filters');
+  document.getElementById('openFilters').addEventListener('click',()=>filterPanel.classList.add('open'));
+  document.getElementById('closeFilters').addEventListener('click',()=>filterPanel.classList.remove('open'));
+  document.getElementById("clearFilters").addEventListener("click", ()=>{
+    document.querySelectorAll('#categoryFilters input, #brandFilters input').forEach(b=>b.checked=false);
+    document.querySelectorAll('#stockFilters input').forEach(b=>b.checked=true);
+    document.getElementById("searchInput").value = "";
+    state.model = "";
+    document.querySelectorAll('.category-chip').forEach((b,i)=>b.classList.toggle('active',i===0));
+    applyFilters();
+  });
+
+  applyFilters();
+</script>
+</body>
+</html>

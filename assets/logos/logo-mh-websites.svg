@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 160" role="img" aria-labelledby="title desc">
+  <title id="title">MH Websites placeholder logo</title><desc id="desc">Replace this file with the final MH Websites logo.</desc>
+  <rect width="420" height="160" rx="24" fill="#f3f6ff"/>
+  <rect x="24" y="24" width="112" height="112" rx="22" fill="#1F51FF"/>
+  <path d="M45 105V56h14l21 25 21-25h14v49h-16V79L80 101 61 79v26z" fill="#fff"/>
+  <circle cx="116" cy="42" r="12" fill="#FF4800"/>
+  <text x="158" y="75" font-family="Arial, sans-serif" font-weight="800" font-size="30" fill="#0A1633">MH WEBSITES</text>
+  <text x="158" y="104" font-family="Arial, sans-serif" font-weight="600" font-size="15" fill="#1F51FF" letter-spacing="2">PLACEHOLDER LOGO</text>
+</svg>

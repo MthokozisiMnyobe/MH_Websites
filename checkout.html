@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — MH Websites</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<div class="page-banner">
+  <div class="container">
+    <span class="eyebrow" style="color:var(--orange-600)">Step 2 of 2</span>
+    <h1>Checkout</h1>
+    <p>This is a demo checkout — no real payment is processed.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container" id="checkoutRoot"></div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/nav.js"></script>
+<script>
+  renderHeader("shop");
+  renderFooter();
+
+  const lines = cartLines();
+  const root = document.getElementById("checkoutRoot");
+
+  if(!lines.length){
+    root.innerHTML = `
+      <div class="empty-cart">
+        <div class="glyph">🧾</div>
+        <h3>There's nothing to check out yet</h3>
+        <p>Add a few products to your cart first.</p>
+        <a href="shop.html" class="btn btn-primary">Shop All Products</a>
+      </div>`;
+  } else {
+    const subtotal = cartSubtotal();
+    const shipping = subtotal >= 750 ? 0 : 99;
+    const total = subtotal + shipping;
+
+    root.innerHTML = `
+      <div class="checkout-layout">
+        <form id="checkoutForm">
+          <div class="contact-card" style="margin-bottom:20px;">
+            <h3 style="font-size:.95rem;">Shipping Details</h3>
+            <div class="form-grid" style="margin-top:16px;">
+              <div class="field"><label>Full name</label><input type="text" required placeholder="Jane Dlamini"></div>
+              <div class="field"><label>Company (optional)</label><input type="text" placeholder="MH Websites"></div>
+              <div class="field full" style="grid-column:1/-1;"><label>Email</label><input type="email" required placeholder="jane@company.co.za"></div>
+              <div class="field full" style="grid-column:1/-1;"><label>Street address</label><input type="text" required placeholder="12 Commerce Street"></div>
+              <div class="field"><label>City</label><input type="text" required placeholder="Johannesburg"></div>
+              <div class="field"><label>Postal code</label><input type="text" required placeholder="2000"></div>
+              <div class="field full" style="grid-column:1/-1;"><label>Phone</label><input type="tel" required placeholder="+27 69 841 8354"></div>
+            </div>
+          </div>
+
+          <div class="contact-card">
+            <h3 style="font-size:.95rem;">Payment (demo only)</h3>
+            <div class="payment-tabs">
+              <div class="payment-tab active">💳 Card</div>
+              <div class="payment-tab">🏦 EFT</div>
+              <div class="payment-tab">📱 Instant Pay</div>
+            </div>
+            <div class="form-grid">
+              <div class="field full" style="grid-column:1/-1;"><label>Card number</label><input type="text" required placeholder="4242 4242 4242 4242"></div>
+              <div class="field"><label>Expiry</label><input type="text" required placeholder="MM/YY"></div>
+              <div class="field"><label>CVC</label><input type="text" required placeholder="123"></div>
+            </div>
+            <p style="font-size:.78rem;margin-top:10px;">🔒 Demo form only — no card data is transmitted or stored.</p>
+          </div>
+        </form>
+
+        <div class="summary-box">
+          <h3 style="font-size:1rem;">Order Summary</h3>
+          ${lines.map(l=>`
+            <div class="mini-line"><span>${l.qty} × ${l.product.name}</span><strong class="mono">${formatPrice(l.product.price*l.qty)}</strong></div>
+          `).join("")}
+          <div class="summary-row" style="margin-top:8px;"><span>Subtotal</span><span class="mono">${formatPrice(subtotal)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span class="mono">${shipping===0?"FREE":formatPrice(shipping)}</span></div>
+          <div class="summary-row total"><span>Total</span><span>${formatPrice(total)}</span></div>
+          <button type="submit" form="checkoutForm" class="btn btn-primary btn-block" style="margin-top:18px;" id="placeOrderBtn">Place Order</button>
+          <a href="cart.html" class="btn btn-outline btn-block btn-sm" style="margin-top:10px;">← Back to Cart</a>
+        </div>
+      </div>
+    `;
+
+    document.querySelectorAll(".payment-tab").forEach(tab=>{
+      tab.addEventListener("click", ()=>{
+        document.querySelectorAll(".payment-tab").forEach(t=>t.classList.remove("active"));
+        tab.classList.add("active");
+      });
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", (e)=>{
+      e.preventDefault();
+      root.innerHTML = `
+        <div class="empty-cart">
+          <div class="glyph">✅</div>
+          <h1 style="font-size:1.6rem;">Order placed — thank you!</h1>
+          <p>This is sample data, so no real order was created, but here's how confirmation would look.</p>
+          <p class="mono" style="color:var(--navy-950);font-weight:700;">ORDER #MH-${Math.floor(100000+Math.random()*900000)}</p>
+          <a href="index.html" class="btn btn-primary">Back to Home</a>
+        </div>`;
+      saveCart([]);
+    });
+  }
+</script>
+</body>
+</html>
