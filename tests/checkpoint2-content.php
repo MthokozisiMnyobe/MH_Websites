@@ -85,5 +85,21 @@ foreach (['full_name', 'organisation', 'email', 'phone', 'enquiry_type', 'prefer
 check(str_contains($contactSource, 'disabled aria-describedby="form-availability-note"'), 'Interim contact submission is disabled');
 check(str_contains($contactSource, 'Your details were not stored or sent'), 'Unexpected POST response is truthful');
 
+$homeSource = (string) file_get_contents($root . '/index.php');
+check(!str_contains($homeSource, 'Digital solutions · East London, South Africa'), 'Homepage hero location eyebrow removed');
+check(!str_contains($homeSource, 'solution-map'), 'Generic category visual removed');
+check(str_contains($homeSource, 'software-product-visual'), 'Software product concept visual present');
+check(str_contains($homeSource, 'Product concept visual'), 'Concept visual is truthfully labelled');
+check(!str_contains($homeSource, '<ul class="credential-list">'), 'Homepage qualification pills removed');
+check(
+    str_contains($homeSource, 'Mthokozisi leads MH Websites with a focus on building practical digital systems'),
+    'Homepage founder description added'
+);
+check(!str_contains($homeSource, 'id="home-cta-title"'), 'Large repeated homepage CTA removed');
+
+$corporateCss = (string) file_get_contents($root . '/assets/css/pages/corporate.css');
+check(!str_contains($corporateCss, '.service-summary:first-child'), 'First service card is not oversized');
+check(str_contains($corporateCss, 'grid-template-columns: repeat(6, minmax(0, 1fr))'), 'Balanced desktop service layout defined');
+
 restore_error_handler();
 echo "Checkpoint 2 content tests passed ({$assertions} assertions)." . PHP_EOL;

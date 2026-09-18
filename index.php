@@ -24,7 +24,6 @@ render_header([
     <section class="corporate-hero" aria-labelledby="home-hero-title">
         <div class="container corporate-hero__inner">
             <div class="corporate-hero__copy">
-                <span class="eyebrow">Digital solutions · East London, South Africa</span>
                 <h1 id="home-hero-title">Digital systems built around real operational problems.</h1>
                 <p class="corporate-hero__lead">
                     MH Websites designs custom software, web platforms and practical technology solutions that help organisations work with greater clarity and control.
@@ -34,15 +33,49 @@ render_header([
                     <a class="button button--light-outline" href="<?= e(url('contact.php')) ?>">Discuss Your Project</a>
                 </div>
             </div>
-            <div class="solution-map" role="group" aria-label="MH Websites solution areas">
-                <div class="solution-map__core">MH</div>
-                <div class="solution-map__items">
-                    <div class="solution-map__item">Custom systems</div>
-                    <div class="solution-map__item">Web platforms</div>
-                    <div class="solution-map__item">Learning technology</div>
-                    <div class="solution-map__item">Data &amp; automation</div>
+            <figure class="software-product-visual" aria-labelledby="software-concept-caption">
+                <div class="software-device">
+                    <div class="software-device__topbar" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                        <strong>MH Systems Studio</strong>
+                    </div>
+                    <div class="software-interface">
+                        <div class="software-sidebar" aria-hidden="true">
+                            <span class="software-sidebar__brand">MH</span>
+                            <i class="is-active"></i><i></i><i></i><i></i><i></i>
+                        </div>
+                        <div class="software-workspace">
+                            <div class="software-workspace__header">
+                                <div><small>Operations workspace</small><strong>Workflow overview</strong></div>
+                                <span>Concept interface</span>
+                            </div>
+                            <div class="software-kpis" aria-hidden="true">
+                                <div><span>Workflow module</span><b></b><i></i></div>
+                                <div><span>Reporting module</span><b></b><i></i></div>
+                                <div><span>Access module</span><b></b><i></i></div>
+                            </div>
+                            <div class="software-dashboard" aria-hidden="true">
+                                <div class="software-chart-panel">
+                                    <div class="software-panel-heading"><span>Activity view</span><i></i></div>
+                                    <svg viewBox="0 0 320 120" focusable="false">
+                                        <path class="chart-grid" d="M0 95H320M0 60H320M0 25H320"></path>
+                                        <path class="chart-area" d="M0 100 C38 91 50 70 85 75 S135 94 166 57 S224 34 252 45 S292 35 320 16 L320 120 L0 120 Z"></path>
+                                        <path class="chart-line" d="M0 100 C38 91 50 70 85 75 S135 94 166 57 S224 34 252 45 S292 35 320 16"></path>
+                                    </svg>
+                                    <div class="software-chart-labels"><span>Plan</span><span>Build</span><span>Review</span></div>
+                                </div>
+                                <div class="software-workflow-panel">
+                                    <div class="software-panel-heading"><span>Process flow</span><i></i></div>
+                                    <div class="software-workflow-step"><b>01</b><span>Capture</span><i></i></div>
+                                    <div class="software-workflow-step"><b>02</b><span>Review</span><i></i></div>
+                                    <div class="software-workflow-step"><b>03</b><span>Complete</span><i></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <figcaption id="software-concept-caption">Product concept visual</figcaption>
+            </figure>
         </div>
     </section>
 
@@ -82,7 +115,7 @@ render_header([
         </div>
     </section>
 
-    <section class="section why-section" aria-labelledby="services-preview-title">
+    <section class="section why-section services-section" aria-labelledby="services-preview-title">
         <div class="container">
             <div class="section-heading section-heading--split">
                 <div>
@@ -165,11 +198,7 @@ render_header([
                     <span class="eyebrow">Meet the Founder</span>
                     <h2 id="founder-preview-title"><?= e($founder['name']) ?></h2>
                     <p><strong><?= e($founder['role']) ?></strong></p>
-                    <ul class="credential-list">
-                        <?php foreach ($founder['credentials'] as $credential): ?>
-                            <li><?= e($credential) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <p class="founder-panel__description">Mthokozisi leads MH Websites with a focus on building practical digital systems, web platforms and technology solutions designed around real organisational needs.</p>
                     <a class="button button--accent" href="<?= e(url('contact.php')) ?>">Discuss Your Project</a>
                 </div>
             </article>
@@ -193,17 +222,5 @@ render_header([
         </div>
     </section>
 
-    <section class="final-cta" aria-labelledby="home-cta-title">
-        <div class="container final-cta__inner">
-            <div>
-                <span class="eyebrow">Start with the problem</span>
-                <h2 id="home-cta-title">Let’s shape a practical digital solution for your organisation.</h2>
-            </div>
-            <div class="final-cta__actions">
-                <a class="button button--accent" href="<?= e(url('contact.php')) ?>">Discuss Your Project</a>
-                <a class="button button--light-outline" href="#systems-preview">Explore Our Systems</a>
-            </div>
-        </div>
-    </section>
 </main>
 <?php render_footer(); ?>
