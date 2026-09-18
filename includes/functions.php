@@ -162,7 +162,7 @@ function footer_navigation_items(): array
 {
     return [
         ...navigation_items(),
-        ['label' => 'Systems', 'path' => 'index.php#systems-preview', 'key' => 'systems'],
+        ['label' => 'Systems', 'path' => 'services.php#custom-software', 'key' => 'systems'],
         ['label' => 'Technology Products', 'path' => 'contact.php?enquiry=technology-products#contact-form', 'key' => 'products'],
     ];
 }

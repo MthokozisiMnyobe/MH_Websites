@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 require __DIR__ . '/config/bootstrap.php';
 
-$systems = systems_portfolio();
 $services = service_categories();
 $founder = founder_profile();
 $collaborators = collaborating_organisations();
@@ -34,65 +33,23 @@ render_header([
                     We design and develop practical digital systems, web platforms and technology solutions that help schools, healthcare environments and businesses work smarter.
                 </p>
                 <div class="corporate-hero__actions">
-                    <a class="button button--accent" href="#systems-preview">Explore Our Systems <span aria-hidden="true">&rarr;</span></a>
+                    <a class="button button--accent" href="<?= e(url('services.php#custom-software')) ?>">Explore Our Systems <span aria-hidden="true">&rarr;</span></a>
                     <a class="button button--light-outline" href="<?= e(url('contact.php')) ?>">Discuss Your Project</a>
                 </div>
             </div>
 
-            <figure class="software-product-visual" aria-labelledby="software-concept-caption">
-                <div class="software-device" aria-hidden="true">
-                    <div class="software-device__topbar">
-                        <span></span><span></span><span></span>
-                        <strong>MH Websites</strong>
-                    </div>
-                    <div class="software-interface">
-                        <aside class="software-sidebar">
-                            <div class="software-sidebar__identity">
-                                <span class="software-sidebar__brand">MH</span>
-                                <strong>Systems</strong>
-                            </div>
-                            <ul>
-                                <li class="is-active"><i></i><span>Dashboard</span></li>
-                                <li><i></i><span>Students</span></li>
-                                <li><i></i><span>Attendance</span></li>
-                                <li><i></i><span>Finance</span></li>
-                                <li><i></i><span>Reports</span></li>
-                                <li><i></i><span>Messages</span></li>
-                                <li><i></i><span>Settings</span></li>
-                            </ul>
-                        </aside>
-                        <div class="software-workspace">
-                            <div class="software-workspace__header">
-                                <div><small>Operations workspace</small><strong>Dashboard overview</strong></div>
-                                <span>Concept interface</span>
-                            </div>
-                            <div class="software-kpis">
-                                <div><span>Records</span><b>Structured</b><i></i></div>
-                                <div><span>Workflow</span><b>Connected</b><i></i></div>
-                                <div><span>Reporting</span><b>Accessible</b><i></i></div>
-                            </div>
-                            <div class="software-dashboard">
-                                <div class="software-chart-panel">
-                                    <div class="software-panel-heading"><span>Reporting view</span><i></i></div>
-                                    <svg viewBox="0 0 320 120" focusable="false">
-                                        <path class="chart-grid" d="M0 95H320M0 60H320M0 25H320"></path>
-                                        <path class="chart-area" d="M0 100 C38 91 50 70 85 75 S135 94 166 57 S224 34 252 45 S292 35 320 16 L320 120 L0 120 Z"></path>
-                                        <path class="chart-line" d="M0 100 C38 91 50 70 85 75 S135 94 166 57 S224 34 252 45 S292 35 320 16"></path>
-                                    </svg>
-                                    <div class="software-chart-labels"><span>Plan</span><span>Build</span><span>Review</span></div>
-                                </div>
-                                <div class="software-workflow-panel">
-                                    <div class="software-panel-heading"><span>Recent workflow</span><i></i></div>
-                                    <div class="software-workflow-step"><b></b><span>Capture</span><i></i></div>
-                                    <div class="software-workflow-step"><b></b><span>Review</span><i></i></div>
-                                    <div class="software-workflow-step"><b></b><span>Complete</span><i></i></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="software-laptop-base" aria-hidden="true"></div>
-                <figcaption id="software-concept-caption">Illustrative software interface concept</figcaption>
+            <figure class="hero-environment" aria-labelledby="hero-environment-caption">
+                <img
+                    src="<?= e(asset_url('images/hero-software-environment.webp')) ?>"
+                    alt=""
+                    width="2172"
+                    height="724"
+                    fetchpriority="high"
+                    decoding="async"
+                >
+                <figcaption id="hero-environment-caption" class="sr-only">
+                    Illustrative MH Websites software dashboard displayed on a laptop in a professional workspace.
+                </figcaption>
             </figure>
         </div>
     </section>
@@ -102,6 +59,7 @@ render_header([
             <div class="section-heading services-section__heading">
                 <span class="eyebrow">Our Services</span>
                 <h2 id="services-preview-title">Expert solutions for a digital world</h2>
+                <p class="services-section__positioning"><strong>Software leads. Technology support completes the picture.</strong></p>
                 <p>From custom systems to ongoing support, we provide end-to-end technology solutions for your organisation.</p>
             </div>
 
@@ -130,6 +88,14 @@ render_header([
                     </article>
                 <?php endforeach; ?>
             </div>
+            <div class="product-division margin-top-8">
+                <div>
+                    <span class="eyebrow">Technology products</span>
+                    <h3>Printers, toner, drum units and accessories by quotation.</h3>
+                    <p class="margin-0">Our technology-products division supports organisations that need practical product guidance alongside technical services. Price and availability are confirmed on quotation.</p>
+                </div>
+                <a class="button button--secondary" href="<?= e(url('contact.php?enquiry=technology-products#contact-form')) ?>">Ask About Products</a>
+            </div>
         </div>
     </section>
 
@@ -152,48 +118,6 @@ render_header([
                     <li><span class="founder-principles__icon" aria-hidden="true">&#8635;</span><strong>Long-Term Support</strong></li>
                 </ul>
             </article>
-        </div>
-    </section>
-
-    <section class="section systems-preview-section" id="systems-preview" aria-labelledby="systems-preview-title">
-        <div class="container">
-            <div class="section-heading section-heading--split">
-                <div>
-                    <span class="eyebrow">Systems portfolio</span>
-                    <h2 id="systems-preview-title">Software leads. Technology support completes the picture.</h2>
-                </div>
-                <p>Our portfolio is designed to grow. These current systems are presented with their honest development status, while the same modular approach supports what comes next.</p>
-            </div>
-            <div class="systems-grid">
-                <?php foreach ($systems as $slug => $system): ?>
-                    <?php
-                    $statusClass = match ($system['status']) {
-                        'Pilot' => 'status-badge--success',
-                        'Prototype' => 'status-badge--warning',
-                        default => '',
-                    };
-                    ?>
-                    <article class="card card--interactive system-card" id="<?= e($slug) ?>">
-                        <div class="system-card__top">
-                            <span class="system-card__mark" aria-hidden="true"><?= e(strtoupper(substr($system['name'], 0, 2))) ?></span>
-                            <span class="status-badge <?= e($statusClass) ?>"><?= e($system['status']) ?></span>
-                        </div>
-                        <div class="system-card__body">
-                            <h3><?= e($system['name']) ?></h3>
-                            <p><?= e($system['description']) ?></p>
-                            <a class="text-link" href="<?= e(url('contact.php?enquiry=custom-software&system=' . rawurlencode($slug) . '#contact-form')) ?>">Request a similar solution <span aria-hidden="true">&rarr;</span></a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            </div>
-            <div class="product-division margin-top-8">
-                <div>
-                    <span class="eyebrow">Technology products</span>
-                    <h3>Printers, toner, drum units and accessories by quotation.</h3>
-                    <p class="margin-0">Our technology-products division supports organisations that need practical product guidance alongside technical services. Price and availability are confirmed on quotation.</p>
-                </div>
-                <a class="button button--secondary" href="<?= e(url('contact.php?enquiry=technology-products#contact-form')) ?>">Ask About Products</a>
-            </div>
         </div>
     </section>
 

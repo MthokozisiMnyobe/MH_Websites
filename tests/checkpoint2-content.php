@@ -66,7 +66,8 @@ check(array_column($collaborators, 'monogram') === ['MH', 'BB', 'HG'], 'Approved
 $navigation = navigation_items();
 check(array_column($navigation, 'key') === ['home', 'services', 'about', 'contact'], 'Header navigation follows approved four-link reference');
 $footerNavigation = footer_navigation_items();
-check(in_array('systems', array_column($footerNavigation, 'key'), true), 'Systems preview remains available in footer navigation');
+$systemsFooterItem = array_values(array_filter($footerNavigation, static fn (array $item): bool => $item['key'] === 'systems'));
+check(($systemsFooterItem[0]['path'] ?? '') === 'services.php#custom-software', 'Systems footer link uses the current software-services route');
 check(in_array('products', array_column($footerNavigation, 'key'), true), 'Technology products remain available in footer navigation');
 
 $contactSource = (string) file_get_contents($root . '/contact.php');
@@ -79,13 +80,18 @@ check(str_contains($contactSource, 'Your details were not stored or sent'), 'Une
 $homeSource = (string) file_get_contents($root . '/index.php');
 check(!str_contains($homeSource, 'Digital solutions · East London, South Africa'), 'Homepage hero location eyebrow removed');
 check(!str_contains($homeSource, 'solution-map'), 'Generic category visual removed');
-check(str_contains($homeSource, 'software-product-visual'), 'Software product concept visual present');
-check(str_contains($homeSource, 'Illustrative software interface concept'), 'Concept visual is truthfully labelled');
+check(str_contains($homeSource, 'hero-environment'), 'Photographic software environment is present');
+check(str_contains($homeSource, 'hero-software-environment.webp'), 'Approved photographic hero asset is referenced');
+check(is_file($root . '/assets/images/hero-software-environment.webp'), 'Approved photographic hero asset exists');
+check(str_contains($homeSource, 'Illustrative MH Websites software dashboard'), 'Concept visual is truthfully labelled');
 check(str_contains($homeSource, 'Software. Websites. Technology.'), 'Approved hero eyebrow present');
 check(str_contains($homeSource, 'Digital systems'), 'Approved hero headline begins correctly');
 check(str_contains($homeSource, 'organisation <em>forward.</em>'), 'Approved hero emphasis is present');
 check(str_contains($homeSource, 'Expert solutions for a digital world'), 'Approved services heading is present');
 check(str_contains($homeSource, 'founder-principles'), 'Compact founder principles are present');
+check(!str_contains($homeSource, 'id="systems-preview"'), 'Homepage systems portfolio section removed');
+check(!str_contains($homeSource, '$systems = systems_portfolio()'), 'Homepage no longer loads a fixed systems collection');
+check(str_contains($homeSource, 'Software leads. Technology support completes the picture.'), 'Approved software-first positioning remains with services');
 check(!str_contains($homeSource, '<ul class="credential-list">'), 'Homepage qualification pills removed');
 check(
     str_contains($homeSource, 'Mthokozisi leads MH Websites with a focus on building practical digital systems'),
