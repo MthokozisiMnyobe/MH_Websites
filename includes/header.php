@@ -19,7 +19,7 @@ function render_header(array $options = []): void
             <div class="site-header__bar container">
                 <a class="brand" href="<?= e(url('index.php')) ?>" aria-label="MH Websites home">
                     <span class="brand__mark" aria-hidden="true">MH</span>
-                    <span class="brand__text">MH Websites<small>Software · Web · Technology</small></span>
+                    <span class="brand__text">MH Websites<small>Software &middot; Web &middot; Technology</small></span>
                 </a>
 
                 <button
@@ -46,7 +46,7 @@ function render_header(array $options = []): void
                         <?php endforeach; ?>
                     </ul>
                     <a class="button button--accent site-nav__cta" href="<?= e(url('contact.php')) ?>">
-                        Discuss Your Project
+                        Discuss Your Project <span aria-hidden="true">&rarr;</span>
                     </a>
                 </nav>
             </div>

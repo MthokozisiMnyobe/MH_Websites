@@ -69,7 +69,7 @@ assert_same(null, flash_get('notice'), 'Flash is consumed once');
 
 ob_start();
 render_header([
-    'active' => 'systems',
+    'active' => 'services',
     'body_class' => 'foundation-test',
     'metadata' => [
         'title' => 'Architecture & <Test>',

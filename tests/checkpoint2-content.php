@@ -64,19 +64,10 @@ check(count($collaborators) === 3, 'Three approved collaboration names');
 check(array_column($collaborators, 'monogram') === ['MH', 'BB', 'HG'], 'Approved collaboration monograms');
 
 $navigation = navigation_items();
-$systemsNavigation = array_values(array_filter(
-    $navigation,
-    static fn (array $item): bool => $item['key'] === 'systems'
-));
-check(($systemsNavigation[0]['path'] ?? '') === 'index.php#systems-preview', 'Systems navigation uses non-broken Checkpoint 2 preview route');
-$storeNavigation = array_values(array_filter(
-    $navigation,
-    static fn (array $item): bool => $item['key'] === 'store'
-));
-check(
-    ($storeNavigation[0]['path'] ?? '') === 'contact.php?enquiry=technology-products#contact-form',
-    'Store navigation uses non-broken Checkpoint 2 enquiry route'
-);
+check(array_column($navigation, 'key') === ['home', 'services', 'about', 'contact'], 'Header navigation follows approved four-link reference');
+$footerNavigation = footer_navigation_items();
+check(in_array('systems', array_column($footerNavigation, 'key'), true), 'Systems preview remains available in footer navigation');
+check(in_array('products', array_column($footerNavigation, 'key'), true), 'Technology products remain available in footer navigation');
 
 $contactSource = (string) file_get_contents($root . '/contact.php');
 foreach (['full_name', 'organisation', 'email', 'phone', 'enquiry_type', 'preferred_contact', 'project_summary', 'privacy_consent'] as $fieldName) {
@@ -89,7 +80,12 @@ $homeSource = (string) file_get_contents($root . '/index.php');
 check(!str_contains($homeSource, 'Digital solutions · East London, South Africa'), 'Homepage hero location eyebrow removed');
 check(!str_contains($homeSource, 'solution-map'), 'Generic category visual removed');
 check(str_contains($homeSource, 'software-product-visual'), 'Software product concept visual present');
-check(str_contains($homeSource, 'Product concept visual'), 'Concept visual is truthfully labelled');
+check(str_contains($homeSource, 'Illustrative software interface concept'), 'Concept visual is truthfully labelled');
+check(str_contains($homeSource, 'Software. Websites. Technology.'), 'Approved hero eyebrow present');
+check(str_contains($homeSource, 'Digital systems'), 'Approved hero headline begins correctly');
+check(str_contains($homeSource, 'organisation <em>forward.</em>'), 'Approved hero emphasis is present');
+check(str_contains($homeSource, 'Expert solutions for a digital world'), 'Approved services heading is present');
+check(str_contains($homeSource, 'founder-principles'), 'Compact founder principles are present');
 check(!str_contains($homeSource, '<ul class="credential-list">'), 'Homepage qualification pills removed');
 check(
     str_contains($homeSource, 'Mthokozisi leads MH Websites with a focus on building practical digital systems'),
@@ -99,7 +95,7 @@ check(!str_contains($homeSource, 'id="home-cta-title"'), 'Large repeated homepag
 
 $corporateCss = (string) file_get_contents($root . '/assets/css/pages/corporate.css');
 check(!str_contains($corporateCss, '.service-summary:first-child'), 'First service card is not oversized');
-check(str_contains($corporateCss, 'grid-template-columns: repeat(6, minmax(0, 1fr))'), 'Balanced desktop service layout defined');
+check(str_contains($corporateCss, 'grid-template-columns: repeat(5, minmax(0, 1fr))'), 'Five-card desktop service layout defined');
 
 restore_error_handler();
 echo "Checkpoint 2 content tests passed ({$assertions} assertions)." . PHP_EOL;
