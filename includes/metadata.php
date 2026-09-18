@@ -11,6 +11,7 @@ function page_metadata(array $overrides = []): array
         'image' => canonical_url('/assets/images/hero-software-3d.webp'),
         'type' => 'website',
         'robots' => 'index,follow',
+        'stylesheets' => [],
     ];
 
     return array_replace($defaults, array_filter(
@@ -41,5 +42,8 @@ function render_metadata(array $overrides = []): void
     <link rel="stylesheet" href="<?= e(asset_url('css/base.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('css/components.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('css/utilities.css')) ?>">
+    <?php foreach ($meta['stylesheets'] as $stylesheet): ?>
+        <link rel="stylesheet" href="<?= e(asset_url('css/' . ltrim((string) $stylesheet, '/'))) ?>">
+    <?php endforeach; ?>
     <?php
 }

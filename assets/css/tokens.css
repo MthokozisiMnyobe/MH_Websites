@@ -5,6 +5,9 @@
   --color-brand-blue-dark: #173cc2;
   --color-brand-orange: #ff4800;
   --color-brand-orange-dark: #d93d00;
+  --color-brand-yellow: #ffcc33;
+  --color-brand-yellow-dark: #8a5705;
+  --color-brand-yellow-soft: #fff6cf;
   --color-navy-950: #07142f;
   --color-navy-900: #0b1c3d;
   --color-navy-800: #102b64;
@@ -23,7 +26,7 @@
   --color-danger-soft: #fee4e2;
   --color-info: #194185;
   --color-info-soft: #eaf0ff;
-  --color-focus: #ff7a45;
+  --color-focus: #a85f00;
   --color-on-accent: #07142f;
 
   --font-sans: Inter, Aptos, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

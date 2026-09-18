@@ -58,6 +58,8 @@ require_once APP_ROOT . '/includes/flash.php';
 require_once APP_ROOT . '/includes/metadata.php';
 require_once APP_ROOT . '/includes/catalogue.php';
 require_once APP_ROOT . '/includes/systems-data.php';
+require_once APP_ROOT . '/includes/services-data.php';
+require_once APP_ROOT . '/includes/company-data.php';
 require_once APP_ROOT . '/includes/header.php';
 require_once APP_ROOT . '/includes/footer.php';
 require_once APP_ROOT . '/config/database.php';

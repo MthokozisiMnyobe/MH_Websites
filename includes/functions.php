@@ -153,8 +153,8 @@ function navigation_items(): array
     return [
         ['label' => 'Home', 'path' => 'index.php', 'key' => 'home'],
         ['label' => 'Services', 'path' => 'services.php', 'key' => 'services'],
-        ['label' => 'Systems', 'path' => 'systems.php', 'key' => 'systems'],
-        ['label' => 'Technology Store', 'path' => 'store/index.php', 'key' => 'store'],
+        ['label' => 'Systems', 'path' => 'index.php#systems-preview', 'key' => 'systems'],
+        ['label' => 'Technology Store', 'path' => 'contact.php?enquiry=technology-products#contact-form', 'key' => 'store'],
         ['label' => 'About', 'path' => 'about.php', 'key' => 'about'],
         ['label' => 'Contact', 'path' => 'contact.php', 'key' => 'contact'],
     ];

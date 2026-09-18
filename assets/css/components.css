@@ -40,7 +40,7 @@
 .eyebrow {
   display: inline-block;
   margin-bottom: var(--space-3);
-  color: var(--color-brand-orange-dark);
+  color: var(--color-brand-yellow-dark);
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   font-weight: 700;
@@ -49,7 +49,7 @@
 }
 
 .section--dark .eyebrow {
-  color: #ff8a5b;
+  color: var(--color-brand-yellow);
 }
 
 .button {
@@ -84,12 +84,12 @@
 }
 
 .button--accent {
-  background: var(--color-brand-orange);
+  background: var(--color-brand-yellow);
   color: var(--color-on-accent);
 }
 
 .button--accent:hover {
-  background: #ff6a2f;
+  background: #ffe070;
   color: var(--color-on-accent);
 }
 
@@ -403,7 +403,7 @@
 .site-nav__list a[aria-current="page"] {
   color: var(--color-white);
   text-decoration: underline;
-  text-decoration-color: var(--color-brand-orange);
+  text-decoration-color: var(--color-brand-yellow);
   text-decoration-thickness: 0.15rem;
   text-underline-offset: 0.4rem;
 }
