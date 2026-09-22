@@ -37,11 +37,19 @@ function render_header(array $options = []): void
                 <nav class="site-nav__panel" id="primary-navigation" aria-label="Primary navigation" data-nav-panel>
                     <ul class="site-nav__list">
                         <?php foreach (navigation_items() as $item): ?>
+                            <?php $isQuoteBasket = $item['key'] === 'quote-basket'; ?>
                             <li>
                                 <a
+                                    class="<?= $isQuoteBasket ? 'site-nav__basket-link' : '' ?>"
                                     href="<?= e(url($item['path'])) ?>"
                                     <?= $active === $item['key'] ? 'aria-current="page"' : '' ?>
-                                ><?= e($item['label']) ?></a>
+                                    <?= $isQuoteBasket ? 'data-basket-link aria-label="Quote Basket, 0 items"' : '' ?>
+                                >
+                                    <?= e($item['label']) ?>
+                                    <?php if ($isQuoteBasket): ?>
+                                        <span class="basket-count site-nav__basket-count" data-basket-count aria-hidden="true">0</span>
+                                    <?php endif; ?>
+                                </a>
                             </li>
                         <?php endforeach; ?>
                     </ul>

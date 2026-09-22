@@ -57,6 +57,7 @@ require_once APP_ROOT . '/includes/security.php';
 require_once APP_ROOT . '/includes/flash.php';
 require_once APP_ROOT . '/includes/metadata.php';
 require_once APP_ROOT . '/includes/catalogue.php';
+require_once APP_ROOT . '/includes/store-components.php';
 require_once APP_ROOT . '/includes/systems-data.php';
 require_once APP_ROOT . '/includes/services-data.php';
 require_once APP_ROOT . '/includes/company-data.php';

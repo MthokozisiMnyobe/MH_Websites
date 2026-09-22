@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-function render_footer(): void
+function render_footer(array $options = []): void
 {
+    $scripts = is_array($options['scripts'] ?? null) ? $options['scripts'] : [];
+    $scripts = array_values(array_unique(['js/store/store-shell.js', ...$scripts]));
     ?>
         <footer class="site-footer">
             <div class="container site-footer__grid">
@@ -34,6 +36,9 @@ function render_footer(): void
             </div>
         </footer>
         <script type="module" src="<?= e(asset_url('js/navigation.js')) ?>"></script>
+        <?php foreach ($scripts as $script): ?>
+            <script type="module" src="<?= e(asset_url((string) $script)) ?>"></script>
+        <?php endforeach; ?>
     </body>
     </html>
     <?php

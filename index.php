@@ -94,7 +94,7 @@ render_header([
                     <h3>Printers, toner, drum units and accessories by quotation.</h3>
                     <p class="margin-0">Our technology-products division supports organisations that need practical product guidance alongside technical services. Price and availability are confirmed on quotation.</p>
                 </div>
-                <a class="button button--secondary" href="<?= e(url('contact.php?enquiry=technology-products#contact-form')) ?>">Ask About Products</a>
+                <a class="button button--secondary" href="<?= e(url('store/index.php')) ?>">Browse Technology Catalogue</a>
             </div>
         </div>
     </section>

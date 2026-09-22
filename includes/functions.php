@@ -153,18 +153,16 @@ function navigation_items(): array
     return [
         ['label' => 'Home', 'path' => 'index.php', 'key' => 'home'],
         ['label' => 'Services', 'path' => 'services.php', 'key' => 'services'],
+        ['label' => 'Catalogue', 'path' => 'store/index.php', 'key' => 'store'],
         ['label' => 'About', 'path' => 'about.php', 'key' => 'about'],
         ['label' => 'Contact', 'path' => 'contact.php', 'key' => 'contact'],
+        ['label' => 'Quote Basket', 'path' => 'store/quote-basket.php', 'key' => 'quote-basket'],
     ];
 }
 
 function footer_navigation_items(): array
 {
-    return [
-        ...navigation_items(),
-        ['label' => 'Systems', 'path' => 'services.php#custom-software', 'key' => 'systems'],
-        ['label' => 'Technology Products', 'path' => 'contact.php?enquiry=technology-products#contact-form', 'key' => 'products'],
-    ];
+    return navigation_items();
 }
 
 function request_is_secure(): bool

@@ -64,11 +64,11 @@ check(count($collaborators) === 3, 'Three approved collaboration names');
 check(array_column($collaborators, 'monogram') === ['MH', 'BB', 'HG'], 'Approved collaboration monograms');
 
 $navigation = navigation_items();
-check(array_column($navigation, 'key') === ['home', 'services', 'about', 'contact'], 'Header navigation follows approved four-link reference');
+check(array_column($navigation, 'key') === ['home', 'services', 'store', 'about', 'contact', 'quote-basket'], 'Header navigation includes catalogue and Quote Basket routes');
 $footerNavigation = footer_navigation_items();
-$systemsFooterItem = array_values(array_filter($footerNavigation, static fn (array $item): bool => $item['key'] === 'systems'));
-check(($systemsFooterItem[0]['path'] ?? '') === 'services.php#custom-software', 'Systems footer link uses the current software-services route');
-check(in_array('products', array_column($footerNavigation, 'key'), true), 'Technology products remain available in footer navigation');
+check(in_array('store', array_column($footerNavigation, 'key'), true), 'Technology catalogue remains available in footer navigation');
+check(in_array('quote-basket', array_column($footerNavigation, 'key'), true), 'Quote Basket remains available in footer navigation');
+check(!in_array('systems', array_column($footerNavigation, 'key'), true), 'Skipped Systems portfolio is not linked in footer navigation');
 
 $contactSource = (string) file_get_contents($root . '/contact.php');
 foreach (['full_name', 'organisation', 'email', 'phone', 'enquiry_type', 'preferred_contact', 'project_summary', 'privacy_consent'] as $fieldName) {
