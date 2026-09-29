@@ -24,6 +24,14 @@ function render_footer(array $options = []): void
                         <?php endforeach; ?>
                     </ul>
                 </nav>
+                <nav aria-label="Legal and information">
+                    <h2 class="site-footer__heading">Legal &amp; Information</h2>
+                    <ul class="site-footer__links">
+                        <?php foreach (legal_navigation_items() as $item): ?>
+                            <li><a href="<?= e(url($item['path'])) ?>"><?= e($item['label']) ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
                 <div>
                     <h2 class="site-footer__heading">Start a conversation</h2>
                     <p>Tell us what your organisation needs to improve, simplify or build.</p>

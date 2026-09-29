@@ -165,6 +165,16 @@ function footer_navigation_items(): array
     return navigation_items();
 }
 
+function legal_navigation_items(): array
+{
+    return [
+        ['label' => 'Privacy & POPIA', 'path' => 'legal/privacy.php'],
+        ['label' => 'Website Terms', 'path' => 'legal/website-terms.php'],
+        ['label' => 'Quotation Terms', 'path' => 'legal/quotation-terms.php'],
+        ['label' => 'Delivery Information', 'path' => 'legal/delivery-information.php'],
+    ];
+}
+
 function request_is_secure(): bool
 {
     if (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off') {

@@ -130,7 +130,7 @@ render_header([
                     </div>
                     <div class="checkbox-field">
                         <input id="privacy-consent" name="privacy_consent" type="checkbox" value="yes" required>
-                        <label for="privacy-consent">I agree that MH Websites may use these details to respond to my enquiry.</label>
+                        <label for="privacy-consent">I agree that MH Websites may use these details to respond to my enquiry, as explained in the <a href="<?= e(url('legal/privacy.php')) ?>">Privacy &amp; POPIA Notice</a>.</label>
                     </div>
                     <div>
                         <button class="button button--primary" type="submit">Submit Enquiry</button>

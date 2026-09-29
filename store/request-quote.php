@@ -126,7 +126,7 @@ render_store_breadcrumbs([['label' => 'Quote Basket', 'path' => 'store/quote-bas
                     </div>
                     <label class="checkbox-field">
                         <input type="checkbox" name="privacy_consent" value="1" required>
-                        <span>I agree that MH Websites may use these details to respond to my quotation request.</span>
+                        <span>I agree that MH Websites may use these details to respond to my quotation request, as explained in the <a href="<?= e(url('legal/privacy.php')) ?>">Privacy &amp; POPIA Notice</a>.</span>
                     </label>
                     <p class="privacy-note" id="quote-submission-note">Your request is validated securely. Pricing and availability are supplied only in the quotation prepared by MH Websites.</p>
                     <button class="button button--accent button--block" type="submit" aria-describedby="quote-submission-note">Submit Quotation Request</button>
