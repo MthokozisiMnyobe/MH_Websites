@@ -1,0 +1,16 @@
+# Prevent Apache from enumerating directories that do not have an index file.
+Options -Indexes
+
+RewriteEngine On
+
+# Reserve this path for future ACME certificate-validation tokens.
+RewriteRule ^\.well-known/acme-challenge(?:/.*)?$ - [L]
+
+# Deny environment files, source-control metadata and every other dot path.
+RewriteRule (^|/)\. - [F,L]
+
+# These directories are used internally or during development, never as HTTP routes.
+RewriteRule ^(?:config|database|documentation|includes|storage|tests|vendor)(?:/|$) - [F,L,NC]
+
+# Build metadata and project documentation do not belong in public responses.
+RewriteRule ^(?:composer\.(?:json|lock)|README(?:\.[^/]*)?|[^/]+\.md)$ - [F,L,NC]
