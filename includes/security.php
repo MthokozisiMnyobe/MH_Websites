@@ -76,3 +76,38 @@ function validate_csrf_or_fail(?string $submittedToken): void
         throw new RuntimeException('The form session has expired. Please refresh and try again.');
     }
 }
+
+function send_application_security_headers(bool $sensitive = false): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    if ($sensitive) {
+        header('Cache-Control: no-store, private, max-age=0');
+        header('Pragma: no-cache');
+        header('X-Robots-Tag: noindex, nofollow, noarchive');
+    }
+}
+
+function request_body_within_limit(): bool
+{
+    $length = filter_var($_SERVER['CONTENT_LENGTH'] ?? 0, FILTER_VALIDATE_INT);
+    return $length !== false && $length >= 0 && $length <= (int) config('submissions.max_body_bytes', 65536);
+}
+
+function client_ip_address(): string
+{
+    $remote = trim((string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'));
+    $trusted = (array) config('app.trusted_proxies', []);
+    if (in_array($remote, $trusted, true)) {
+        $forwarded = trim(explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''))[0]);
+        if (filter_var($forwarded, FILTER_VALIDATE_IP) !== false) {
+            return $forwarded;
+        }
+    }
+    return filter_var($remote, FILTER_VALIDATE_IP) !== false ? $remote : '0.0.0.0';
+}

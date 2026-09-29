@@ -1,0 +1,8 @@
+{
+    "name": "mh-websites/mh-websites",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "phpmailer/phpmailer": "^7.1"
+    }
+}

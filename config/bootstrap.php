@@ -6,6 +6,11 @@ define('APP_ROOT', dirname(__DIR__));
 
 require_once APP_ROOT . '/includes/functions.php';
 
+$composerAutoload = APP_ROOT . '/vendor/autoload.php';
+if (is_file($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
 load_env_file(APP_ROOT . '/.env');
 
 $debug = (bool) env_value('APP_DEBUG', false);
@@ -23,6 +28,8 @@ $GLOBALS['app_config'] = [
         'timezone' => (string) env_value('APP_TIMEZONE', 'Africa/Johannesburg'),
         'session_name' => (string) env_value('APP_SESSION_NAME', 'mh_websites_session'),
         'session_save_path' => (string) env_value('SESSION_SAVE_PATH', APP_ROOT . '/storage/sessions'),
+        'key' => (string) env_value('APP_KEY', ''),
+        'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) env_value('TRUSTED_PROXIES', ''))))),
     ],
     'database' => [
         'host' => (string) env_value('DB_HOST', ''),
@@ -34,6 +41,7 @@ $GLOBALS['app_config'] = [
     ],
     'mail' => [
         'enabled' => (bool) env_value('MAIL_ENABLED', false),
+        'transport' => (string) env_value('MAIL_TRANSPORT', 'null'),
         'host' => (string) env_value('MAIL_HOST', ''),
         'port' => (int) env_value('MAIL_PORT', 587),
         'username' => (string) env_value('MAIL_USERNAME', ''),
@@ -42,6 +50,17 @@ $GLOBALS['app_config'] = [
         'from_address' => (string) env_value('MAIL_FROM_ADDRESS', ''),
         'from_name' => (string) env_value('MAIL_FROM_NAME', 'MH Websites'),
         'notification_address' => (string) env_value('MAIL_NOTIFICATION_ADDRESS', ''),
+        'timeout_seconds' => (int) env_value('MAIL_TIMEOUT_SECONDS', 10),
+    ],
+    'rate_limit' => [
+        'attempts' => (int) env_value('RATE_LIMIT_ATTEMPTS', 6),
+        'window_seconds' => (int) env_value('RATE_LIMIT_WINDOW_SECONDS', 900),
+    ],
+    'submissions' => [
+        'max_body_bytes' => (int) env_value('SUBMISSION_MAX_BODY_BYTES', 65536),
+        'max_basket_lines' => (int) env_value('SUBMISSION_MAX_BASKET_LINES', 50),
+        'idempotency_ttl' => (int) env_value('IDEMPOTENCY_TTL_SECONDS', 3600),
+        'confirmation_ttl' => (int) env_value('CONFIRMATION_TTL_SECONDS', 1800),
     ],
     'contact' => [
         'whatsapp_number' => (string) env_value('WHATSAPP_NUMBER', ''),
@@ -57,6 +76,14 @@ require_once APP_ROOT . '/includes/security.php';
 require_once APP_ROOT . '/includes/flash.php';
 require_once APP_ROOT . '/includes/metadata.php';
 require_once APP_ROOT . '/includes/catalogue.php';
+require_once APP_ROOT . '/includes/submission-validation.php';
+require_once APP_ROOT . '/includes/submission-reference.php';
+require_once APP_ROOT . '/includes/idempotency.php';
+require_once APP_ROOT . '/includes/rate-limit.php';
+require_once APP_ROOT . '/includes/submission-access.php';
+require_once APP_ROOT . '/includes/mailer.php';
+require_once APP_ROOT . '/includes/quotation-service.php';
+require_once APP_ROOT . '/includes/enquiry-service.php';
 require_once APP_ROOT . '/includes/store-components.php';
 require_once APP_ROOT . '/includes/systems-data.php';
 require_once APP_ROOT . '/includes/services-data.php';
@@ -66,3 +93,4 @@ require_once APP_ROOT . '/includes/footer.php';
 require_once APP_ROOT . '/config/database.php';
 
 register_application_exception_handler();
+send_application_security_headers();

@@ -74,8 +74,9 @@ $contactSource = (string) file_get_contents($root . '/contact.php');
 foreach (['full_name', 'organisation', 'email', 'phone', 'enquiry_type', 'preferred_contact', 'project_summary', 'privacy_consent'] as $fieldName) {
     check(str_contains($contactSource, 'name="' . $fieldName . '"'), 'Contact field has name: ' . $fieldName);
 }
-check(str_contains($contactSource, 'disabled aria-describedby="form-availability-note"'), 'Interim contact submission is disabled');
-check(str_contains($contactSource, 'Your details were not stored or sent'), 'Unexpected POST response is truthful');
+check(str_contains($contactSource, 'csrf_field()'), 'Contact submission includes CSRF protection');
+check(str_contains($contactSource, 'idempotency_token'), 'Contact submission includes idempotency protection');
+check(str_contains($contactSource, 'create_enquiry('), 'Contact submission uses the secure enquiry service');
 
 $homeSource = (string) file_get_contents($root . '/index.php');
 check(!str_contains($homeSource, 'Digital solutions · East London, South Africa'), 'Homepage hero location eyebrow removed');

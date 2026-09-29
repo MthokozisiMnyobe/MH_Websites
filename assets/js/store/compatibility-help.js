@@ -17,7 +17,6 @@ try {
 }
 
 form?.addEventListener('submit', (event) => {
-  event.preventDefault();
   if (!form.reportValidity()) return;
   const data = Object.fromEntries(new FormData(form).entries());
   const draft = {};
@@ -25,5 +24,5 @@ form?.addEventListener('submit', (event) => {
     draft[name] = String(data[name] ?? '').slice(0, name === 'notes' ? 1200 : 120);
   }
   window.sessionStorage.setItem(COMPATIBILITY_DRAFT_KEY, JSON.stringify(draft));
-  status.textContent = 'Compatibility details saved in this browser session. They have not been sent.';
+  status.textContent = 'Saving compatibility details securelyâ€¦';
 });

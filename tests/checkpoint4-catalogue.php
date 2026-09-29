@@ -126,12 +126,14 @@ catalogue_check(str_contains($basketClientSource, "querySelector('[data-basket-p
 catalogue_check(str_contains($basketClientSource, "querySelector('[data-basket-total-quantity]')"), 'Basket client updates total unit count');
 
 $requestSource = (string) file_get_contents($root . '/store/request-quote.php');
-catalogue_check(str_contains($requestSource, 'disabled aria-describedby="quote-submission-note"'), 'Quotation submission remains disabled');
-catalogue_check(str_contains($requestSource, 'was not stored or sent'), 'Unexpected POST handling is truthful');
+catalogue_check(str_contains($requestSource, 'csrf_field()'), 'Quotation submission includes CSRF protection');
+catalogue_check(str_contains($requestSource, 'data-basket-payload'), 'Quotation submission carries the minimal basket payload');
+catalogue_check(str_contains($requestSource, 'create_quotation_request('), 'Quotation submission uses the secure service');
 
 $confirmationSource = (string) file_get_contents($root . '/store/quote-confirmation.php');
-catalogue_check(str_contains($confirmationSource, 'No quotation request has been submitted'), 'Confirmation route makes no success claim');
-catalogue_check(!str_contains($confirmationSource, 'MHQ-'), 'Confirmation route fabricates no quotation reference');
+catalogue_check(str_contains($confirmationSource, 'load_authorised_quotation'), 'Confirmation requires authorised persisted data');
+catalogue_check(!str_contains($confirmationSource, '$_GET'), 'Confirmation exposes no URL access token or identifier');
+catalogue_check(str_contains($confirmationSource, '&ndash; quantity'), 'Confirmation uses an encoding-safe product quantity separator');
 
 foreach (['systems.php', 'systems/eduflow.php', 'systems/clinicflow.php', 'systems/peopleflow.php', 'systems/learnhub.php', 'systems/ai-assistant.php', 'systems/insighthub.php'] as $skippedRoute) {
     catalogue_check(!is_file($root . '/' . $skippedRoute), 'Skipped Checkpoint 3 route remains absent: ' . $skippedRoute);

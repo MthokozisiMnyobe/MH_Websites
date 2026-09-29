@@ -3,12 +3,33 @@
 declare(strict_types=1);
 
 require dirname(__DIR__) . '/config/bootstrap.php';
+ensure_session_started();
 
 $selectedProductId = mb_substr(trim((string) ($_GET['product'] ?? '')), 0, 100);
 if ($selectedProductId !== '' && catalogue_product($selectedProductId) === null) {
     $selectedProductId = '';
 }
-$interimNotice = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST';
+$errors = [];
+$saved = false;
+if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST') {
+    try {
+        require_post_request();
+        if (!request_body_within_limit()) {
+            throw new SubmissionValidationException(['submission' => 'The request is too large.']);
+        }
+        validate_csrf_or_fail($_POST['csrf_token'] ?? null);
+        $draft = validate_compatibility_draft($_POST);
+        if ($draft === null) {
+            throw new SubmissionValidationException(['submission' => 'Please provide compatibility details.']);
+        }
+        $_SESSION['compatibility_draft'] = $draft;
+        $saved = true;
+        $selectedProductId = $draft['product_id'];
+    } catch (SubmissionValidationException $exception) {
+        $errors = $exception->errors;
+    }
+}
+$existingDraft = is_array($_SESSION['compatibility_draft'] ?? null) ? $_SESSION['compatibility_draft'] : [];
 
 render_header([
     'active' => 'store',
@@ -41,9 +62,9 @@ render_store_breadcrumbs([['label' => 'Compatibility Help']]);
             </div>
 
             <form class="store-form" method="post" action="<?= e(url('store/compatibility-help.php')) ?>" data-compatibility-form>
-                <?php if ($interimNotice): ?>
-                    <div class="alert alert--warning" role="alert">Compatibility details were not stored or sent. Enable JavaScript to keep a temporary browser-session draft.</div>
-                <?php endif; ?>
+                <?= csrf_field() ?>
+                <?php if ($saved): ?><div class="alert" role="status">Compatibility details saved securely to this session draft.</div><?php endif; ?>
+                <?php if ($errors !== []): ?><div class="alert alert--danger" role="alert"><?= e((string) reset($errors)) ?></div><?php endif; ?>
                 <div class="form-grid form-grid--2">
                     <div class="field">
                         <label for="device-type">Device type</label>
@@ -84,7 +105,7 @@ render_store_breadcrumbs([['label' => 'Compatibility Help']]);
                     <strong>Photo upload</strong>
                     <p>A secure device-label or cartridge-photo upload will be added with the server workflow. It is not active yet.</p>
                 </div>
-                <p class="privacy-note">These details are saved only in this browser session for inclusion in your quotation draft. They are not sent to MH Websites yet.</p>
+                <p class="privacy-note">These details are kept in your secure server session and included only when you submit a quotation request.</p>
                 <div class="form-actions">
                     <button class="button button--primary" type="submit">Save to Quotation Draft</button>
                     <a class="button button--secondary" href="<?= e(url('store/quote-basket.php')) ?>">View Quote Basket</a>

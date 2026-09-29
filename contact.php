@@ -5,15 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/config/bootstrap.php';
 
 $contact = company_contact();
-$interestOptions = [
-    'custom-software' => 'Custom Software Development',
-    'web-development' => 'Website & E-commerce Development',
-    'learning-platforms' => 'Learning Platforms & Moodle',
-    'data-automation' => 'Dashboards, Data & Automation',
-    'ict-support' => 'ICT Support & Systems Integration',
-    'technology-products' => 'Technology Products / Accessories',
-    'general' => 'General Enquiry',
-];
+$interestOptions = enquiry_type_options();
 $selectedInterest = (string) ($_GET['enquiry'] ?? '');
 if (!array_key_exists($selectedInterest, $interestOptions)) {
     $selectedInterest = '';
@@ -21,7 +13,45 @@ if (!array_key_exists($selectedInterest, $interestOptions)) {
 
 $systemSlug = (string) ($_GET['system'] ?? '');
 $systemInterest = system_record($systemSlug);
-$unexpectedSubmission = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
+$errors = [];
+if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST') {
+    try {
+        require_post_request();
+        if (!request_body_within_limit()) {
+            http_response_code(413);
+            throw new SubmissionValidationException(['submission' => 'The request is too large.']);
+        }
+        validate_csrf_or_fail($_POST['csrf_token'] ?? null);
+        $enquiry = validate_enquiry($_POST, $interestOptions);
+        $idempotencyHash = consume_idempotency_token('enquiry', $_POST['idempotency_token'] ?? null);
+        $pdo = database_connection();
+        if (!$pdo instanceof PDO) {
+            throw new RuntimeException('Submission storage is unavailable.');
+        }
+        enforce_submission_rate_limit($pdo, 'enquiry');
+        $reference = create_enquiry($pdo, $enquiry, $idempotencyHash);
+        flash_set('enquiry_success', 'Your enquiry was received. Reference: ' . $reference);
+        session_regenerate_id(true);
+        header('Location: ' . url('contact.php#contact-form'), true, 303);
+        attempt_submission_notifications(
+            configured_mailer(),
+            'enquiry',
+            $reference,
+            static fn(): array => enquiry_owner_notification_context($enquiry)
+        );
+        exit;
+    } catch (SubmissionValidationException $exception) {
+        $errors = $exception->errors;
+    } catch (RateLimitExceededException $exception) {
+        http_response_code(429); header('Retry-After: ' . (string) config('rate_limit.window_seconds', 900));
+        $errors = ['submission' => $exception->getMessage()];
+    } catch (Throwable $exception) {
+        safe_log('Enquiry submission failed.', ['failure_category' => $exception::class]);
+        $errors = ['submission' => 'We could not securely store your enquiry. Please try again later or contact MH Websites directly.'];
+    }
+}
+$enquirySuccess = flash_get('enquiry_success');
+$idempotencyToken = issue_idempotency_token('enquiry');
 
 render_header([
     'active' => 'contact',
@@ -48,38 +78,32 @@ render_header([
             <div class="contact-form-panel" id="contact-form">
                 <span class="eyebrow">Project enquiry</span>
                 <h2 id="contact-section-title">How can we help?</h2>
-                <div class="alert alert--warning" id="form-availability-note">
-                    <strong>Online submission is not active yet.</strong>
-                    <p class="margin-0">The secure enquiry workflow will be connected in Checkpoint 5. Nothing entered here is currently transmitted or stored. Please use the phone or email contact options for an immediate enquiry.</p>
-                </div>
-
-                <?php if ($unexpectedSubmission): ?>
-                    <div class="alert alert--danger margin-top-4" role="alert">
-                        This form is not connected yet. Your details were not stored or sent. Please contact MH Websites by phone or email.
-                    </div>
-                <?php endif; ?>
+                <?php if ($enquirySuccess !== null): ?><div class="alert margin-top-4" role="status"><?= e($enquirySuccess) ?></div><?php endif; ?>
+                <?php if ($errors !== []): ?><div class="alert alert--danger margin-top-4" role="alert"><strong>Your enquiry was not submitted.</strong><p><?= e((string) reset($errors)) ?></p></div><?php endif; ?>
 
                 <?php if ($systemInterest !== null): ?>
                     <p class="alert margin-top-4">System interest: <strong><?= e($systemInterest['name']) ?></strong> — <?= e($systemInterest['description']) ?>.</p>
                 <?php endif; ?>
 
-                <form class="form-grid margin-top-8" method="post" action="<?= e(url('contact.php#contact-form')) ?>" aria-describedby="form-availability-note">
+                <form class="form-grid margin-top-8" method="post" action="<?= e(url('contact.php#contact-form')) ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="idempotency_token" value="<?= e($idempotencyToken) ?>">
                     <div class="form-grid form-grid--2">
                         <div class="field">
                             <label class="field__label" for="full-name">Full name</label>
-                            <input class="input" id="full-name" name="full_name" type="text" autocomplete="name" required>
+                            <input class="input" id="full-name" name="full_name" type="text" minlength="2" maxlength="120" autocomplete="name" required>
                         </div>
                         <div class="field">
                             <label class="field__label" for="organisation">Organisation <span class="text-muted">(optional)</span></label>
-                            <input class="input" id="organisation" name="organisation" type="text" autocomplete="organization">
+                            <input class="input" id="organisation" name="organisation" type="text" maxlength="160" autocomplete="organization">
                         </div>
                         <div class="field">
                             <label class="field__label" for="email">Email address</label>
-                            <input class="input" id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+                            <input class="input" id="email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" required>
                         </div>
                         <div class="field">
                             <label class="field__label" for="phone">Phone number <span class="text-muted">(optional)</span></label>
-                            <input class="input" id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel">
+                            <input class="input" id="phone" name="phone" type="tel" maxlength="40" autocomplete="tel" inputmode="tel">
                         </div>
                     </div>
                     <div class="field">
@@ -106,10 +130,10 @@ render_header([
                     </div>
                     <div class="checkbox-field">
                         <input id="privacy-consent" name="privacy_consent" type="checkbox" value="yes" required>
-                        <label for="privacy-consent">I agree that MH Websites may use these details to respond to my enquiry once secure submission is enabled.</label>
+                        <label for="privacy-consent">I agree that MH Websites may use these details to respond to my enquiry.</label>
                     </div>
                     <div>
-                        <button class="button button--primary" type="submit" disabled aria-describedby="form-availability-note">Secure Submission Coming in Checkpoint 5</button>
+                        <button class="button button--primary" type="submit">Submit Enquiry</button>
                     </div>
                 </form>
             </div>

@@ -4,7 +4,57 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/config/bootstrap.php';
 
-$interimNotice = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST';
+$errors = [];
+if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST') {
+    try {
+        require_post_request();
+        if (!request_body_within_limit()) {
+            http_response_code(413);
+            throw new SubmissionValidationException(['submission' => 'The request is too large.']);
+        }
+        validate_csrf_or_fail($_POST['csrf_token'] ?? null);
+        $customer = validate_quotation_customer($_POST);
+        if (!$customer['privacy_consent']) {
+            throw new SubmissionValidationException(['privacy_consent' => 'Consent is required.']);
+        }
+        $items = validate_basket_payload($_POST['basket_payload'] ?? null);
+        $compatibility = $_SESSION['compatibility_draft'] ?? null;
+        $idempotencyHash = consume_idempotency_token('quotation', $_POST['idempotency_token'] ?? null);
+        $pdo = database_connection();
+        if (!$pdo instanceof PDO) {
+            throw new RuntimeException('Submission storage is unavailable.');
+        }
+        enforce_submission_rate_limit($pdo, 'quotation');
+        $created = create_quotation_request($pdo, $customer, $items, is_array($compatibility) ? $compatibility : null, $idempotencyHash);
+        $reference = $created['reference'];
+        establish_submission_grant('quotation', $reference, $created['confirmation_token']);
+        unset($_SESSION['compatibility_draft']);
+        session_regenerate_id(true);
+        header('Location: ' . url('store/quote-confirmation.php'), true, 303);
+        attempt_submission_notifications(
+            configured_mailer(),
+            'quotation',
+            $reference,
+            static fn(): array => quotation_owner_notification_context(
+                $customer,
+                $items,
+                is_array($compatibility) ? $compatibility : null
+            )
+        );
+        exit;
+    } catch (SubmissionValidationException $exception) {
+        $errors = $exception->errors;
+    } catch (RateLimitExceededException $exception) {
+        http_response_code(429);
+        header('Retry-After: ' . (string) config('rate_limit.window_seconds', 900));
+        $errors = ['submission' => $exception->getMessage()];
+    } catch (Throwable $exception) {
+        safe_log('Quotation submission failed.', ['failure_category' => $exception::class]);
+        $errors = ['submission' => 'We could not securely store your request. Please try again later or contact MH Websites directly.'];
+    }
+}
+$idempotencyToken = issue_idempotency_token('quotation');
+$compatibilityDraft = is_array($_SESSION['compatibility_draft'] ?? null) ? $_SESSION['compatibility_draft'] : null;
 
 render_header([
     'active' => 'store',
@@ -31,14 +81,18 @@ render_store_breadcrumbs([['label' => 'Quote Basket', 'path' => 'store/quote-bas
                 <p>Review your selected items and prepare the details MH Websites will need to respond.</p>
             </div>
 
-            <?php if ($interimNotice): ?>
-                <div class="alert alert--warning" role="alert">
-                    Your quotation request was not stored or sent. Secure submission will be activated in Checkpoint 1E.
+            <?php if ($errors !== []): ?>
+                <div class="alert alert--danger" role="alert">
+                    <strong>Your quotation request was not submitted.</strong>
+                    <p><?= e((string) reset($errors)) ?></p>
                 </div>
             <?php endif; ?>
 
             <div class="request-quote-layout">
                 <form class="store-form request-quote-form" method="post" action="<?= e(url('store/request-quote.php')) ?>" data-quote-request-form>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="idempotency_token" value="<?= e($idempotencyToken) ?>">
+                    <input type="hidden" name="basket_payload" value="" data-basket-payload>
                     <h2>Contact details</h2>
                     <div class="form-grid form-grid--2">
                         <div class="field">
@@ -51,7 +105,7 @@ render_store_breadcrumbs([['label' => 'Quote Basket', 'path' => 'store/quote-bas
                         </div>
                         <div class="field">
                             <label for="quote-email">Email address</label>
-                            <input id="quote-email" name="email" type="email" maxlength="160" autocomplete="email" required>
+                            <input id="quote-email" name="email" type="email" maxlength="254" autocomplete="email" required>
                         </div>
                         <div class="field">
                             <label for="quote-phone">Phone number</label>
@@ -72,13 +126,10 @@ render_store_breadcrumbs([['label' => 'Quote Basket', 'path' => 'store/quote-bas
                     </div>
                     <label class="checkbox-field">
                         <input type="checkbox" name="privacy_consent" value="1" required>
-                        <span>I understand these details will be used to respond to my quotation request when secure submission is activated.</span>
+                        <span>I agree that MH Websites may use these details to respond to my quotation request.</span>
                     </label>
-                    <div class="interim-submit-panel" id="quote-submission-note">
-                        <strong>Secure submission is not active yet.</strong>
-                        <p>This interface does not store, email or submit your personal information during Checkpoint 1D.</p>
-                    </div>
-                    <button class="button button--accent button--block" type="submit" disabled aria-describedby="quote-submission-note">Submit Quotation Request</button>
+                    <p class="privacy-note" id="quote-submission-note">Your request is validated securely. Pricing and availability are supplied only in the quotation prepared by MH Websites.</p>
+                    <button class="button button--accent button--block" type="submit" aria-describedby="quote-submission-note">Submit Quotation Request</button>
                 </form>
 
                 <aside class="quote-review-panel" aria-labelledby="quote-review-title">
@@ -88,14 +139,13 @@ render_store_breadcrumbs([['label' => 'Quote Basket', 'path' => 'store/quote-bas
                         <p>Your Quote Basket is empty.</p>
                         <a class="text-link" href="<?= e(url('store/index.php')) ?>">Browse products</a>
                     </div>
-                    <div class="compatibility-draft" data-compatibility-draft hidden>
+                    <div class="compatibility-draft" data-compatibility-draft<?= $compatibilityDraft === null ? ' hidden' : '' ?>>
                         <h3>Compatibility details prepared</h3>
-                        <dl data-compatibility-summary></dl>
+                        <dl data-compatibility-summary><?php if ($compatibilityDraft !== null): foreach ($compatibilityDraft as $key => $value): if ($value === '') continue; ?><div><dt><?= e(ucwords(str_replace('_', ' ', $key))) ?></dt><dd><?= e($key === 'product_id' ? (catalogue_product((string) $value)['name'] ?? $value) : $value) ?></dd></div><?php endforeach; endif; ?></dl>
                     </div>
                     <div class="quote-review-actions">
                         <a class="text-link" href="<?= e(url('store/quote-basket.php')) ?>">Edit Quote Basket</a>
                         <a class="text-link" href="<?= e(url('store/compatibility-help.php')) ?>">Add compatibility details</a>
-                        <a class="text-link" href="<?= e(url('store/print-request.php')) ?>">Print browser draft</a>
                     </div>
                 </aside>
             </div>

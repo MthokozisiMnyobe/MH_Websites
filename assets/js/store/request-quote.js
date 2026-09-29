@@ -7,6 +7,8 @@ const productMap = new Map(products.map((product) => [product.id, product]));
 const basket = readBasket(window.localStorage, products.map((product) => product.id));
 const itemsContainer = document.querySelector('[data-request-items]');
 const emptyState = document.querySelector('[data-request-empty]');
+const payload = document.querySelector('[data-basket-payload]');
+if (payload) payload.value = JSON.stringify(basket.map(({ id, quantity }) => ({ id, quantity })));
 
 function createSummaryLine(item) {
   const product = productMap.get(item.id);
@@ -25,11 +27,12 @@ if (itemsContainer) {
   emptyState.hidden = basket.length !== 0;
 }
 
+/* Legacy browser drafts are shown only when no authoritative server draft is present. */
 try {
   const draft = JSON.parse(window.sessionStorage.getItem(COMPATIBILITY_DRAFT_KEY) ?? 'null');
   const panel = document.querySelector('[data-compatibility-draft]');
   const summary = document.querySelector('[data-compatibility-summary]');
-  if (draft && panel && summary) {
+  if (draft && panel && summary && summary.children.length === 0) {
     const labels = {
       device_type: 'Device type',
       manufacturer: 'Manufacturer',
