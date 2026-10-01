@@ -82,10 +82,11 @@ function send_application_security_headers(bool $sensitive = false): void
     if (headers_sent()) {
         return;
     }
+    header_remove('X-Powered-By');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    header('X-Frame-Options: SAMEORIGIN');
-    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header('X-Frame-Options: DENY');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()');
     if ($sensitive) {
         header('Cache-Control: no-store, private, max-age=0');
         header('Pragma: no-cache');

@@ -14,3 +14,10 @@ RewriteRule ^(?:config|database|documentation|includes|storage|tests|vendor)(?:/
 
 # Build metadata and project documentation do not belong in public responses.
 RewriteRule ^(?:composer\.(?:json|lock)|README(?:\.[^/]*)?|[^/]+\.md)$ - [F,L,NC]
+
+# Static resources do not pass through the PHP application header layer.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?:css|js|mjs|webp|svg|png|jpe?g|gif|ico|woff2?|ttf|otf)$">
+        Header always set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+</IfModule>
