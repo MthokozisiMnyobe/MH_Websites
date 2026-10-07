@@ -8,9 +8,9 @@ function founder_profile(): array
         'name' => 'Mthokozisi Hlomela Mnyobe',
         'role' => 'Founder and Managing Director',
         'credentials' => ['IT Graduate', 'CompTIA Network+ certified'],
-        'image' => 'images/director-mthokozisi.webp',
-        'image_width' => 1280,
-        'image_height' => 1280,
+        'image' => 'images/director-mthokozisi.png',
+        'image_width' => 1122,
+        'image_height' => 1402,
     ];
 }
 

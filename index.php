@@ -6,7 +6,24 @@ require __DIR__ . '/config/bootstrap.php';
 
 $services = service_categories();
 $founder = founder_profile();
-$collaborators = collaborating_organisations();
+$collaborationIdentities = [
+    [
+        'image' => 'images/Collaboration/ApexTech Glossy 3D Logo.png',
+        'alt' => 'Representative ApexTech collaboration identity',
+    ],
+    [
+        'image' => 'images/Collaboration/SkyNex Cloud Solutions Logo.png',
+        'alt' => 'Representative SkyNex collaboration identity',
+    ],
+    [
+        'image' => 'images/Collaboration/EduNova_ Shaping Brighter Futures.png',
+        'alt' => 'Representative EduNova collaboration identity',
+    ],
+    [
+        'image' => 'images/Collaboration/GlobalLink Neon Network Logo.png',
+        'alt' => 'Representative GlobalLink collaboration identity',
+    ],
+];
 
 render_header([
     'active' => 'home',
@@ -154,19 +171,29 @@ render_header([
         </div>
     </section>
 
-    <section class="section" aria-labelledby="collaborations-title">
-        <div class="container">
-            <div class="section-heading">
-                <span class="eyebrow">Collaboration context</span>
-                <h2 id="collaborations-title">Organisations We Collaborate With</h2>
+    <section class="section collaboration-showcase" aria-labelledby="collaborations-title">
+        <div class="container container--wide">
+            <div class="section-heading collaboration-showcase__heading">
+                <span class="eyebrow">Representative ecosystem</span>
+                <h2 id="collaborations-title">Collaboration ready</h2>
+                <p>Designed to integrate with organisations, platforms and digital ecosystems. Representative identities are shown for demonstration.</p>
             </div>
-            <div class="collaboration-grid">
-                <?php foreach ($collaborators as $organisation): ?>
-                    <article class="collaboration-card">
-                        <span class="collaboration-card__mark" aria-hidden="true"><?= e($organisation['monogram']) ?></span>
-                        <h3><?= e($organisation['name']) ?></h3>
-                    </article>
-                <?php endforeach; ?>
+            <div class="collaboration-marquee">
+                <ul class="collaboration-moving-group" role="list">
+                    <?php foreach ($collaborationIdentities as $identity): ?>
+                        <li class="collaboration-logo">
+                            <img
+                                class="collaboration-logo-image"
+                                src="<?= e(asset_url($identity['image'])) ?>"
+                                alt="<?= e($identity['alt']) ?>"
+                                width="1536"
+                                height="1024"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
         </div>
     </section>

@@ -18,7 +18,13 @@ function render_header(array $options = []): void
         <header class="site-header" data-site-header>
             <div class="site-header__bar container">
                 <a class="brand" href="<?= e(url('index.php')) ?>" aria-label="MH Websites home">
-                    <span class="brand__mark" aria-hidden="true">MH</span>
+                    <img
+                        class="site-brand-logo"
+                        src="<?= e(asset_url('images/mh-websites-logo-transparent.png')) ?>"
+                        alt="MH Websites"
+                        width="44"
+                        height="44"
+                    >
                     <span class="brand__text">MH Websites<small>Software &middot; Web &middot; Technology</small></span>
                 </a>
 

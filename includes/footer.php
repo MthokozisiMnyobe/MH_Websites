@@ -11,7 +11,15 @@ function render_footer(array $options = []): void
             <div class="container site-footer__grid">
                 <div class="site-footer__about">
                     <a class="brand" href="<?= e(url('index.php')) ?>" aria-label="MH Websites home">
-                        <span class="brand__mark" aria-hidden="true">MH</span>
+                        <img
+                            class="footer-brand-logo"
+                            src="<?= e(asset_url('images/mh-websites-logo-transparent.png')) ?>"
+                            alt="MH Websites"
+                            width="72"
+                            height="72"
+                            loading="lazy"
+                            decoding="async"
+                        >
                         <span class="brand__text">MH Websites<small>Software &middot; Web &middot; Technology</small></span>
                     </a>
                     <p>Custom software, websites and digital systems built around how your organisation works.</p>

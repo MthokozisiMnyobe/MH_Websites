@@ -5,7 +5,6 @@ declare(strict_types=1);
 require __DIR__ . '/config/bootstrap.php';
 
 $founder = founder_profile();
-$collaborators = collaborating_organisations();
 
 render_header([
     'active' => 'about',
@@ -82,24 +81,6 @@ render_header([
                     <a class="button button--accent" href="<?= e(url('contact.php')) ?>">Discuss Your Project</a>
                 </div>
             </article>
-        </div>
-    </section>
-
-    <section class="section why-section" aria-labelledby="about-collaborations-title">
-        <div class="container">
-            <div class="section-heading">
-                <span class="eyebrow">Collaboration context</span>
-                <h2 id="about-collaborations-title">Organisations We Collaborate With</h2>
-                <p>Names are shown for context only, without implying endorsement, certification or a legal partnership.</p>
-            </div>
-            <div class="collaboration-grid">
-                <?php foreach ($collaborators as $organisation): ?>
-                    <article class="collaboration-card">
-                        <span class="collaboration-card__mark" aria-hidden="true"><?= e($organisation['monogram']) ?></span>
-                        <h3><?= e($organisation['name']) ?></h3>
-                    </article>
-                <?php endforeach; ?>
-            </div>
         </div>
     </section>
 
